@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- This page's URL briefly holds a one-time authorization code: never add analytics, fonts or any other external resource here. -->
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'none'; script-src 'sha256-MHX14KqGZXtojaekSGa6cwaHW7enjPao18vX2bOv4hY='; base-uri 'none'; form-action 'none'">
+<title>Connexion QuickBooks</title>
+</head>
+<body>
+<main>
+<h1>Connexion à QuickBooks</h1>
+<p id="msg">Retour vers le connecteur sur votre ordinateur…</p>
+<noscript><p>JavaScript est nécessaire pour terminer la connexion. Activez-le, puis relancez la connexion depuis Claude.</p></noscript>
+<p class="muted" lang="en">Returning to the connector on your computer…</p>
+</main>
+<script>
+// Intuit only redirects to HTTPS pages in production, so this page hands Intuit's answer to the connector
+// listening on this same computer. It stores and sends nothing anywhere else; the connector checks "state".
+(function () {
+  var LOCAL_CALLBACK = "http://localhost:3000/callback";
+  var KEYS = ["code", "state", "realmId", "error"];
+  var params = new URLSearchParams(window.location.search);
+  var forward = new URLSearchParams();
+  KEYS.forEach(function (key) {
+    if (params.has(key)) forward.set(key, params.get(key));
+  });
+  history.replaceState(null, "", window.location.pathname);
+  if (!forward.has("state")) {
+    document.getElementById("msg").textContent = "Lien de connexion incomplet. Relancez la connexion depuis Claude.";
+    return;
+  }
+  window.location.replace(LOCAL_CALLBACK + "?" + forward.toString());
+})();
+</script>
+</body>
+</html>
